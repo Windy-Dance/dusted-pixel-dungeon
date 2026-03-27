@@ -1,0 +1,218 @@
+# RegionDecoLineEntranceRoom 文档
+
+## 1. 基本信息
+
+| 属性 | 值 |
+|------|-----|
+| **文件路径** | D:\Develop\Workspace\DustedPixelDungeon\core\src\main\java\com\shatteredpixel\shatteredpixeldungeon\levels\rooms\standard\entrance\RegionDecoLineEntranceRoom.java |
+| **包名** | com.shatteredpixel.shatteredpixeldungeon.levels.rooms.standard.entrance |
+| **文件类型** | class |
+| **继承关系** | extends StatueLineEntranceRoom |
+| **代码行数** | 33 |
+| **所属模块** | core |
+
+## 2. 文件职责说明
+
+### 核心职责
+RegionDecoLineEntranceRoom 类负责创建和绘制具有装饰性线条布局的入口房间。这类房间沿最少使用的墙壁放置一排 REGION_DECO 装饰性地形，并在安全位置设置通向上一层的入口。
+
+### 系统定位
+作为 StatueLineEntranceRoom 的特殊变体，RegionDecoLineEntranceRoom 在较深的地牢关卡（深度16-20）中出现，为入口房间提供带有装饰性线条的布局样式。
+
+### 不负责什么
+- 不负责处理玩家与入口的交互逻辑（由 LevelTransition 系统处理）
+- 不负责新手引导页面的放置（仅在深度1-2的简单入口房间中放置）
+- 不负责装饰性线条的基础生成逻辑（由父类处理）
+
+## 3. 结构总览
+
+### 主要成员概览
+- 无额外字段或常量
+- 覆写父类的装饰地形方法
+
+### 主要逻辑块概览
+- 装饰地形设置（decoTerrain 返回 Terrain.REGION_DECO）
+- 继承父类的所有入口房间功能
+
+### 生命周期/调用时机
+- 在 LevelGenerator 创建关卡时通过 EntranceRoom.createEntrance() 创建
+- 在 Level.paint() 过程中调用 paint() 方法进行绘制
+
+## 4. 继承与协作关系
+
+### 父类提供的能力
+- `StatueLineEntranceRoom` 提供的入口房间功能（paint, isEntrance, 尺寸约束）
+- `StatueLineRoom` 提供的装饰性线条生成逻辑（fillAlongSide, sidePreferences）
+- `StandardRoom` 提供的基础房间管理
+- `Room` 提供的空间和连接逻辑
+
+### 覆写的方法
+- `decoTerrain()`: 返回 Terrain.REGION_DECO 而非 Terrain.STATUE
+
+### 实现的接口契约
+- 继承自 `Room` 的 `paint(Level level)` 抽象方法
+
+### 依赖的关键类
+- `Level`: 关卡数据结构
+- `Terrain`: 地形类型定义（REGION_DECO, EMPTY, ENTRANCE）
+- `Painter`: 地形绘制工具
+- `LevelTransition`: 关卡过渡点管理
+
+### 使用者
+- `EntranceRoom.createEntrance()`: 通过反射创建实例
+- `Level.paint()`: 调用 paint() 方法
+
+## 5. 字段/常量详解
+
+### 静态常量
+| 常量名 | 类型 | 值 | 说明 |
+|--------|------|-----|------|
+| 无静态常量 | - | - | - |
+
+### 实例字段
+| 字段名 | 类型 | 默认值 | 说明 |
+|--------|------|--------|------|
+| 无实例字段 | - | - | - |
+
+## 6. 构造与初始化机制
+
+### 构造器
+RegionDecoLineEntranceRoom 使用默认构造器，没有显式的构造方法。继承自父类的构造逻辑。
+
+### 初始化块
+无静态或实例初始化块。
+
+### 初始化注意事项
+- 依赖父类 StatueLineEntranceRoom 的尺寸约束（最小7x7）
+- 入口房间出现在深度16-20的关卡中（根据 EntranceRoom.chances 配置）
+
+## 7. 方法详解（必须覆盖全部方法）
+
+### decoTerrain()
+
+**可见性**：protected
+
+**是否覆写**：是，覆写自 StatueLineRoom
+
+**方法职责**：定义装饰性线条使用的地形类型
+
+**参数**：无
+
+**返回值**：int，返回 Terrain.REGION_DECO
+
+**前置条件**：无
+
+**副作用**：无
+
+**核心实现逻辑**：
+返回 Terrain.REGION_DECO 常量，使得父类的 fillAlongSide() 方法使用 REGION_DECO 地形而非 STATUE 地形来绘制装饰性线条。
+
+**边界情况**：无
+
+## 8. 对外暴露能力
+
+### 显式 API
+- 继承的所有公共方法
+
+### 内部辅助方法
+- `decoTerrain()`: 虽然 protected，但主要由父类内部调用
+
+### 扩展入口
+- 可以通过继承 RegionDecoLineEntranceRoom 并覆写 decoTerrain() 或其他方法来自定义行为
+
+## 9. 运行机制与调用链
+
+### 创建时机
+- 在 LevelGenerator.generate() 方法中，当深度为16-20且随机选择到 RegionDecoLineEntranceRoom 类型时创建
+
+### 调用者
+- EntranceRoom.createEntrance(): 通过反射调用构造器
+- Level.paint(): 调用 paint()
+
+### 被调用者
+- StatueLineEntranceRoom.paint(): 父类入口绘制逻辑
+- StatueLineRoom.fillAlongSide(): 装饰线条绘制
+- Painter.drawLine(): 直线绘制
+- LevelTransition 构造器: 创建过渡点
+
+### 系统流程位置
+1. EntranceRoom.createEntrance() 创建 RegionDecoLineEntranceRoom 实例
+2. LevelGenerator 将房间加入关卡并建立连接
+3. Level.paint() 调用 paint() 方法
+4. paint() 执行装饰线条绘制和入口设置
+
+## 10. 资源、配置与国际化关联
+
+### 引用的 messages 文案
+| 键名 | 中文翻译 | 用途 |
+|------|---------|------|
+| levels.level.entrance_desc | 通向上一层的楼梯。 | 入口地形的描述文本 |
+
+### 依赖的资源
+- 无直接的纹理/图标/音效依赖
+- 间接依赖 Terrain.ENTRANCE、Terrain.REGION_DECO 相关的视觉表现
+
+### 中文翻译来源
+来自 D:\Develop\Workspace\DustedPixelDungeon\core\src\main\assets\messages\levels\levels_zh.properties
+
+## 11. 使用示例
+
+### 基本用法
+```java
+// RegionDecoLineEntranceRoom 通过 EntranceRoom.createEntrance() 自动创建
+// 无需手动实例化
+```
+
+### 扩展示例
+```java
+// 自定义装饰性线条入口房间
+public class CustomRegionDecoLineEntranceRoom extends RegionDecoLineEntranceRoom {
+    @Override
+    protected int decoTerrain() {
+        return Terrain.REGION_DECO_ALT; // 使用替代装饰地形
+    }
+}
+```
+
+## 12. 开发注意事项
+
+### 状态依赖
+- 依赖父类的装饰性线条生成逻辑
+- 依赖父类的入口位置选择逻辑
+- 依赖 Level.map 的当前状态
+
+### 生命周期耦合
+- paint() 方法必须在父类装饰性线条绘制完成后调用
+- 入口位置选择依赖于父类已经完成的装饰地形放置
+
+### 常见陷阱
+- 修改 decoTerrain() 返回值会影响整个装饰线条的外观
+- 确保选择的装饰地形与游戏整体美术风格一致
+- 装饰性线条的位置选择逻辑由父类控制
+
+## 13. 修改建议与扩展点
+
+### 适合扩展的位置
+- 覆写 decoTerrain() 方法使用不同的装饰地形
+- 扩展 paint() 方法添加额外的装饰逻辑
+- 调整装饰地形的视觉效果
+
+### 不建议修改的位置
+- 装饰性线条的位置选择逻辑（由父类控制）
+- 基础的入口位置选择逻辑
+- 装饰地形的基本概念
+
+### 重构建议
+- 考虑将装饰地形类型提取到配置中
+- 可以添加选项来控制装饰线条的方向偏好
+
+## 14. 事实核查清单
+
+- [x] 是否已覆盖全部字段
+- [x] 是否已覆盖全部方法
+- [x] 是否已检查继承链与覆写关系
+- [x] 是否已核对官方中文翻译
+- [x] 是否存在任何推测性表述
+- [x] 示例代码是否真实可用
+- [x] 是否遗漏资源/配置/本地化关联
+- [x] 是否明确说明了注意事项与扩展点
